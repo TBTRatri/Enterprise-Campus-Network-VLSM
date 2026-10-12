@@ -11,32 +11,82 @@ st.set_page_config(
 st.title("🌐 Enterprise Campus Network Architecture & VLSM Explorer")
 st.markdown(
     "Interactive topology breakdown, Cisco IOS device configuration viewer, "
-    "live **VLSM Subnet Allocation Engine**, and dynamic simulation captures."
+    "live **VLSM Subnet Allocation Engine**, and dynamic simulation playback."
 )
 
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📸 Simulation Capture",
+    "🎥 Simulation Walkthrough",
     "🧮 Interactive VLSM Engine",
     "🏢 VLAN & Campus Topology",
     "⚙️ Cisco IOS Config Viewer",
 ])
 
 with tab1:
-  st.subheader("📸 Cisco Packet Tracer Dynamic Simulation")
+  st.subheader("🎥 Cisco Packet Tracer Dynamic Simulation")
   st.markdown(
-      "Packet flow tracing, Inter-VLAN routing, and ICMP connectivity validation."
+      "Live packet flow tracing, ICMP ping testing, DHCP lease distribution, "
+      "and OSPF routing convergence across the enterprise campus topology."
   )
 
-  image_filename = "packet_simulation.png"
+  # Check for supported media files in repository root
+  media_found = False
 
-  if os.path.exists(image_filename):
-    st.image(
-        image_filename,
-        caption="Cisco Packet Tracer Architecture & Simulation Run",
-        use_container_width=True,
+  # 1. Check for standard video formats
+  for vfile in [
+      "simulation.mp4",
+      "demo.mp4",
+      "packet_simulation.mp4",
+      "simulation.webm",
+      "demo.mov",
+  ]:
+    if os.path.exists(vfile):
+      with open(vfile, "rb") as f:
+        st.video(f.read())
+      media_found = True
+      break
+
+  # 2. Check for animated GIF
+  if not media_found:
+    for gfile in ["simulation.gif", "demo.gif", "packet_simulation.gif"]:
+      if os.path.exists(gfile):
+        st.image(
+            gfile,
+            caption="Cisco Packet Tracer Dynamic Simulation (Animated Loop)",
+            use_container_width=True,
+        )
+        media_found = True
+        break
+
+  # 3. Check for static PNG capture fallback
+  if not media_found:
+    for ifile in [
+        "packet_simulation.png",
+        "topology.png",
+        "simulation.png",
+        "demo.png",
+    ]:
+      if os.path.exists(ifile):
+        st.image(
+            ifile,
+            caption="Cisco Packet Tracer Architecture & Simulation Snapshot",
+            use_container_width=True,
+        )
+        media_found = True
+        break
+
+  # External stream or YouTube link fallback
+  st.divider()
+  external_video = st.text_input(
+      "Stream external video walkthrough (YouTube / Vimeo / Direct URL):",
+      placeholder="https://www.youtube.com/watch?v=...",
+  )
+  if external_video:
+    st.video(external_video)
+  elif not media_found:
+    st.info(
+        "Upload your video recording (`simulation.mp4`), an animated GIF (`simulation.gif`), "
+        "or paste an external YouTube link above to activate dynamic playback."
     )
-  else:
-    st.warning(f"File `{image_filename}` not found in the repository root.")
 
 with tab2:
   st.subheader("Dynamic VLSM Subnet Calculator")
@@ -82,13 +132,14 @@ with tab2:
           ("Server Farm", h_server, 40),
           ("Core WAN Link", h_wan, 99),
       ]
+      # Order descending for optimal VLSM allocation
       subnets_req.sort(key=lambda x: x[1], reverse=True)
 
       results = []
       current_ip = int(net.network_address)
 
       for name, hosts, vlan_id in subnets_req:
-        needed = hosts + 2
+        needed = hosts + 2  # Network + Broadcast
         prefix = 32 - (needed - 1).bit_length()
         sub_net = ipaddress.IPv4Network(
             f"{ipaddress.IPv4Address(current_ip)}/{prefix}"
