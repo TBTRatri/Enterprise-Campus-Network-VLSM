@@ -28,6 +28,8 @@ Subnets were assigned using Variable Length Subnet Masking (VLSM) prioritizing h
 | **Switch Backbone** | Infrastructure | `16.69.4.64` | `/29` | `16.69.4.65 - 16.69.4.70` | N/A |
 | **WAN Serial Links** | Point-to-Point | `16.69.4.72+`| `/30` | 2 usable addresses per link | N/A |
 
+![Hierarchical VLSM Tree Diagram](VLSM_Tree_Diagram.png)
+
 ---
 
 ## Core Network Features
